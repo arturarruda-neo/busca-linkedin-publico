@@ -1,0 +1,4 @@
+output/resultados.json
+scripts/__pycache__/
+.env
+.claude/settings.local.json
