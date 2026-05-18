@@ -1,4 +1,4 @@
-output/*.json
+output/
 scripts/__pycache__/
 .env
 .claude/settings.local.json
