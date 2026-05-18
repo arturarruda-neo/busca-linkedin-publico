@@ -108,7 +108,7 @@ Construa uma lista com **apenas as empresas processadas** (não as puladas) nest
 
 - `contatos` e `urls_linkedin` são listas paralelas (índice 0 corresponde ao índice 0)
 - Listas vazias resultam em "N.A." na planilha
-- Salve em `output/resultados.json` (o diretório é criado automaticamente se não existir)
+- Salve em `output/resultados.json`
 
 ---
 
