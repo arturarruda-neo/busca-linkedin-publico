@@ -27,20 +27,20 @@ pip install -r requirements.txt
 
 Pergunte ao usuário:
 
-1. **Qual é a letra da coluna com o nome da empresa?** (ex: `C`)
-2. **Qual é a letra da coluna com os sócios?** (um por linha dentro da célula, ex: `K`)
-3. **Qual é a letra da coluna onde gravar o contato encontrado?** (ex: `L`)
-4. **Qual é a letra da coluna onde gravar a URL do LinkedIn?** (ex: `O`)
+1. **Qual é a letra da coluna com o nome da empresa?** (ex: `A`)
+2. **Qual é a letra da coluna com os sócios?** (um por linha dentro da célula, ex: `B`)
+3. **Qual é a letra da coluna onde gravar o contato encontrado?** (ex: `C`)
+4. **Qual é a letra da coluna onde gravar a URL do LinkedIn?** (ex: `D`)
 
 Com as respostas, edite `config/config.json`:
 
 ```json
 {
   "columns": {
-    "empresa": "LETRA_EMPRESA",
-    "socios": "LETRA_SOCIOS",
-    "contato": "LETRA_CONTATO",
-    "linkedin": "LETRA_LINKEDIN"
+    "empresa": "A",
+    "socios": "B",
+    "contato": "C",
+    "linkedin": "D"
   }
 }
 ```
