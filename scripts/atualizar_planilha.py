@@ -15,38 +15,29 @@ def atualizar_planilha(url, arquivo_resultados):
     atualizacoes = []
     for r in resultados:
         linha = r["linha"]
-        contato = r.get("contato", "N/A")
-        url_linkedin = r.get("url_linkedin", "")
+        contatos = r.get("contatos", [])
+        urls_linkedin = r.get("urls_linkedin", [])
         linkedin_existente = r.get("linkedin_existente", "")
 
-        atualizacoes.append({
-            "range": f"L{linha}",
-            "values": [[contato]],
-        })
+        contato_str = "\n".join(contatos) if contatos else "N.A."
+        url_str = "\n".join(urls_linkedin) if urls_linkedin else "N.A."
 
-        if url_linkedin and not linkedin_existente.strip():
-            atualizacoes.append({
-                "range": f"O{linha}",
-                "values": [[url_linkedin]],
-            })
+        atualizacoes.append({"range": f"L{linha}", "values": [[contato_str]]})
+
+        if not linkedin_existente.strip():
+            atualizacoes.append({"range": f"O{linha}", "values": [[url_str]]})
 
     if atualizacoes:
         ws.batch_update(atualizacoes)
-        time.sleep(1)  # respeitar rate limit da API
+        time.sleep(1)
 
-    encontrados = sum(1 for r in resultados if r.get("url_linkedin"))
-    nao_encontrados = sum(1 for r in resultados if not r.get("url_linkedin"))
-    linkedin_ja_preenchido = sum(
-        1 for r in resultados
-        if r.get("url_linkedin") and r.get("linkedin_existente", "").strip()
-    )
+    encontrados = sum(1 for r in resultados if r.get("urls_linkedin"))
+    nao_encontrados = sum(1 for r in resultados if not r.get("urls_linkedin"))
 
     print(f"\nProcessamento concluido!")
-    print(f"Total de linhas:         {len(resultados)}")
+    print(f"Total de linhas:            {len(resultados)}")
     print(f"[OK] LinkedIn encontrado:   {encontrados}")
     print(f"[--] Nao encontrado (N/A):  {nao_encontrados}")
-    if linkedin_ja_preenchido:
-        print(f"[~~] LinkedIn ja preenchido: {linkedin_ja_preenchido} (URL nao sobrescrita)")
     print(f"\nPlanilha atualizada com sucesso.")
 
 

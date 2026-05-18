@@ -15,25 +15,42 @@ Automação que busca perfis LinkedIn de sócios de empresas em Google Sheets e 
 | L | Contato | **Escrito** — nome do sócio encontrado, ou "N.A." |
 | O | LinkedIn | **Escrito** — URL, somente se a célula estiver vazia |
 
-## Script principal
+## Fluxo principal (WebSearch)
 
 ```bash
-python "C:/secret-sauce/busca-linkedin/scripts/buscar_linkedin_cse.py" "[URL]" [linha_inicial] [num_linhas]
+# 1. Ler dados da planilha
+python "C:/secret-sauce/busca-linkedin/scripts/ler_planilha.py" "[URL]" [linha_inicial] [num_linhas]
+
+# 2. Claude busca via WebSearch — query: {nome_sócio} {nome_empresa} LinkedIn
+#    Coletar LinkedIn de TODOS os sócios com perfil (não apenas o primeiro)
+#    Pular linhas onde coluna L já preenchida e diferente de "N.A."
+
+# 3. Salvar resultados e atualizar planilha
+python "C:/secret-sauce/busca-linkedin/scripts/atualizar_planilha.py" "[URL]" "C:/secret-sauce/busca-linkedin/output/resultados.json"
 ```
 
-Lê a planilha, busca LinkedIn via Google CSE (5 em paralelo), escreve L e O via batch_update.
-Pula linhas com L já preenchido (diferente de vazio e "N.A.").
+Formato do `resultados.json`:
 
-Requer: `GOOGLE_CSE_API_KEY` e `GOOGLE_CSE_ID` como variáveis de ambiente.
-Cota CSE: 100 queries/dia gratuitas (~$5/1.000 além disso).
+```json
+[
+  {
+    "linha": 17,
+    "contatos": ["NOME A", "NOME B"],
+    "urls_linkedin": ["https://linkedin.com/in/...", "https://linkedin.com/in/..."],
+    "linkedin_existente": ""
+  }
+]
+```
 
-`ler_planilha.py` e `atualizar_planilha.py` são legados — usar só se o CSE falhar.
+- `contatos` e `urls_linkedin` vazios → grava "N.A." em L e O
+- Coluna O só é escrita se `linkedin_existente` estiver vazia
 
 ## Autenticação Google Sheets
 
 - gspread OAuth Desktop
 - Credenciais: `C:\Users\MF Capital\AppData\Roaming\gspread\credentials.json`
-- Token já salvo — sem necessidade de nova autenticação
+- Token expira ocasionalmente — reautenticar com:
+  `& "C:\Users\MF Capital\AppData\Local\Python\pythoncore-3.14-64\python.exe" "C:\secret-sauce\busca-linkedin\scripts\autenticar_gspread.py"`
 
 ## Convenções
 

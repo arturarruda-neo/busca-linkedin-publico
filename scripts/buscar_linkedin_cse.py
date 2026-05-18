@@ -1,8 +1,13 @@
 import os
 import sys
+from pathlib import Path
+
 import gspread
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 API_KEY = os.environ["GOOGLE_CSE_API_KEY"]
 CSE_ID = os.environ["GOOGLE_CSE_ID"]
