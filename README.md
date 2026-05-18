@@ -58,15 +58,15 @@ Para mais detalhes, consulte a [documentação oficial do gspread](https://docs.
 ```json
 {
   "columns": {
-    "empresa": "C",
-    "socios": "K",
-    "contato": "L",
-    "linkedin": "O"
+    "empresa": "A",
+    "socios": "B",
+    "contato": "C",
+    "linkedin": "D"
   }
 }
 ```
 
-> Os valores `C`, `K`, `L`, `O` são apenas exemplos. Você **deve** trocá-los pelas letras correspondentes na sua planilha antes de executar o script.
+> Os valores `A`, `B`, `C`, `D` são apenas exemplos. Você **deve** trocá-los pelas letras correspondentes na sua planilha antes de executar o script.
 
 ### Colunas
 
