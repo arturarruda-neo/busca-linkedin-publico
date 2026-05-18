@@ -1,6 +1,16 @@
 import json
 import argparse
+from pathlib import Path
 import gspread
+
+CONFIG_FILE = Path(__file__).parent.parent / "config" / "config.json"
+
+
+def load_config():
+    if CONFIG_FILE.exists():
+        with open(CONFIG_FILE) as f:
+            return json.load(f).get("columns", {})
+    return {}
 
 
 def col_to_idx(col_letter, start_col):
@@ -41,14 +51,16 @@ def ler_planilha(url, linha_inicial, num_linhas, col_empresa, col_socios, col_co
 
 
 if __name__ == "__main__":
+    cfg = load_config()
+
     parser = argparse.ArgumentParser(description="Lê dados de empresas e sócios de uma planilha Google Sheets.")
     parser.add_argument("url", help="URL da planilha Google Sheets")
     parser.add_argument("linha_inicial", type=int, help="Linha inicial dos dados")
     parser.add_argument("num_linhas", type=int, help="Número de linhas a ler")
-    parser.add_argument("--col-empresa", default="C", metavar="COL", help="Coluna do nome da empresa (padrão: C)")
-    parser.add_argument("--col-socios", default="K", metavar="COL", help="Coluna dos sócios separados por quebra de linha (padrão: K)")
-    parser.add_argument("--col-contato", default="L", metavar="COL", help="Coluna para gravar o contato encontrado (padrão: L)")
-    parser.add_argument("--col-linkedin", default="O", metavar="COL", help="Coluna para gravar a URL do LinkedIn (padrão: O)")
+    parser.add_argument("--col-empresa", default=cfg.get("empresa", "C"), metavar="COL", help="Coluna do nome da empresa")
+    parser.add_argument("--col-socios", default=cfg.get("socios", "K"), metavar="COL", help="Coluna dos sócios separados por quebra de linha")
+    parser.add_argument("--col-contato", default=cfg.get("contato", "L"), metavar="COL", help="Coluna para gravar o contato encontrado")
+    parser.add_argument("--col-linkedin", default=cfg.get("linkedin", "O"), metavar="COL", help="Coluna para gravar a URL do LinkedIn")
     args = parser.parse_args()
 
     ler_planilha(

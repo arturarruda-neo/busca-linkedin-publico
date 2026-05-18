@@ -5,38 +5,73 @@ description: Busca perfis do LinkedIn de sócios de empresas em uma planilha Goo
 
 # Busca de Perfis LinkedIn — Google Sheets
 
-## Passo 1 — Confirmar configuração da planilha
-
-Pergunte ao usuário (se não informado):
-
-1. **URL** da planilha Google Sheets
-2. **Linha inicial** dos dados (primeira linha após o cabeçalho)
-3. **Quantas linhas** processar
-4. **Mapeamento de colunas** — informe os padrões abaixo e pergunte se o usuário quer alterar:
-
-| Parâmetro        | Padrão | Descrição                                          |
-|------------------|--------|----------------------------------------------------|
-| `--col-empresa`  | `C`    | Coluna com o nome da empresa                       |
-| `--col-socios`   | `K`    | Coluna com os sócios (separados por quebra de linha) |
-| `--col-contato`  | `L`    | Coluna onde gravar o nome do sócio encontrado      |
-| `--col-linkedin` | `O`    | Coluna onde gravar a URL do LinkedIn               |
+Automatiza a busca de perfis LinkedIn de sócios de empresas, lendo os dados de uma planilha Google Sheets e escrevendo os resultados nas colunas de contato e LinkedIn definidas pelo usuário.
 
 ---
 
-## Passo 2 — Ler a planilha
+## Passo 1 — Verificar configuração
 
+Verifique se existem no diretório do projeto:
+- `config/config.json` com as letras de coluna corretas para a planilha do usuário
+- gspread OAuth2 configurado — requer `credentials.json` do Google Cloud Console
+  (guia completo: https://docs.gspread.org/en/latest/oauth2.html e seção "Configuração do Google Sheets" no README)
+
+Se as dependências não estiverem instaladas:
 ```bash
-python scripts/ler_planilha.py "[URL]" [linha_inicial] [num_linhas] \
-  --col-empresa [COL] --col-socios [COL] --col-contato [COL] --col-linkedin [COL]
+pip install -r requirements.txt
 ```
 
-O script imprime um JSON com a lista de empresas, sócios, contato atual e LinkedIn existente.
+---
+
+## Passo 2 — Configurar colunas
+
+Pergunte ao usuário:
+
+1. **Qual é a letra da coluna com o nome da empresa?** (ex: `C`)
+2. **Qual é a letra da coluna com os sócios?** (um por linha dentro da célula, ex: `K`)
+3. **Qual é a letra da coluna onde gravar o contato encontrado?** (ex: `L`)
+4. **Qual é a letra da coluna onde gravar a URL do LinkedIn?** (ex: `O`)
+
+Com as respostas, edite `config/config.json`:
+
+```json
+{
+  "columns": {
+    "empresa": "LETRA_EMPRESA",
+    "socios": "LETRA_SOCIOS",
+    "contato": "LETRA_CONTATO",
+    "linkedin": "LETRA_LINKEDIN"
+  }
+}
+```
+
+---
+
+## Passo 3 — Coletar informações da planilha
+
+Pergunte ao usuário:
+
+1. **URL da planilha** Google Sheets
+2. **A partir de qual linha processar?** (primeira linha de dados, após o cabeçalho)
+3. **Quantas linhas processar nessa rodada?**
+
+Se o usuário informar "linha X até linha Y", calcular `num_linhas = Y - linha_inicial + 1`.
+
+---
+
+## Passo 4 — Ler a planilha
+
+```bash
+python scripts/ler_planilha.py "[URL]" [linha_inicial] [num_linhas]
+```
+
+O script lê as colunas definidas em `config/config.json` e imprime um JSON com empresas, sócios, contato atual e LinkedIn existente.
 
 **Pule** linhas onde `contato` já está preenchido e é diferente de `"N.A."`.
 
 ---
 
-## Passo 3 — Buscar LinkedIn via WebSearch
+## Passo 5 — Buscar LinkedIn via WebSearch
 
 Dispare todas as buscas **em paralelo** — uma chamada WebSearch por sócio, em uma única mensagem com múltiplos tool calls.
 
@@ -50,7 +85,7 @@ Para cada sócio a buscar:
 
 ---
 
-## Passo 4 — Montar o JSON de resultados
+## Passo 6 — Montar o JSON de resultados
 
 Construa uma lista com **apenas as empresas processadas** (não as puladas) neste formato:
 
@@ -73,15 +108,27 @@ Construa uma lista com **apenas as empresas processadas** (não as puladas) nest
 
 - `contatos` e `urls_linkedin` são listas paralelas (índice 0 corresponde ao índice 0)
 - Listas vazias resultam em "N.A." na planilha
-- Salve em `output/resultados.json`
+- Salve em `output/resultados.json` (o diretório é criado automaticamente se não existir)
 
 ---
 
-## Passo 5 — Atualizar a planilha
+## Passo 7 — Atualizar a planilha
 
 ```bash
-python scripts/atualizar_planilha.py "[URL]" "output/resultados.json" \
-  --col-contato [COL] --col-linkedin [COL]
+python scripts/atualizar_planilha.py "[URL]" "output/resultados.json"
 ```
 
 O script grava a coluna de contato para todas as linhas processadas e a coluna de LinkedIn apenas se a célula estiver vazia.
+
+---
+
+## Problemas comuns
+
+| Problema | Solução |
+|----------|---------|
+| `SpreadsheetNotFound` | Verificar URL da planilha e permissão de acesso |
+| `ModuleNotFoundError` | Rodar `pip install -r requirements.txt` |
+| `python: command not found` | Usar `python3` no lugar de `python` (Mac/Linux) |
+| `FileNotFoundError: credentials.json` | Seguir o guia de OAuth no README |
+| Token expirado (erro 401) | Rodar `python scripts/autenticar_gspread.py` para reautenticar |
+| Linhas já preenchidas não são reprocessadas | Regra de skip bloqueia qualquer contato diferente de "N.A."; limpar a célula para reprocessar |

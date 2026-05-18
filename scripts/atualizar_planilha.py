@@ -1,7 +1,17 @@
 import json
 import time
 import argparse
+from pathlib import Path
 import gspread
+
+CONFIG_FILE = Path(__file__).parent.parent / "config" / "config.json"
+
+
+def load_config():
+    if CONFIG_FILE.exists():
+        with open(CONFIG_FILE) as f:
+            return json.load(f).get("columns", {})
+    return {}
 
 
 def atualizar_planilha(url, arquivo_resultados, col_contato, col_linkedin):
@@ -41,11 +51,13 @@ def atualizar_planilha(url, arquivo_resultados, col_contato, col_linkedin):
 
 
 if __name__ == "__main__":
+    cfg = load_config()
+
     parser = argparse.ArgumentParser(description="Atualiza planilha Google Sheets com resultados de busca LinkedIn.")
     parser.add_argument("url", help="URL da planilha Google Sheets")
     parser.add_argument("arquivo_resultados", help="Caminho para o arquivo resultados.json")
-    parser.add_argument("--col-contato", default="L", metavar="COL", help="Coluna para gravar o contato (padrão: L)")
-    parser.add_argument("--col-linkedin", default="O", metavar="COL", help="Coluna para gravar a URL do LinkedIn (padrão: O)")
+    parser.add_argument("--col-contato", default=cfg.get("contato", "L"), metavar="COL", help="Coluna para gravar o contato")
+    parser.add_argument("--col-linkedin", default=cfg.get("linkedin", "O"), metavar="COL", help="Coluna para gravar a URL do LinkedIn")
     args = parser.parse_args()
 
     atualizar_planilha(args.url, args.arquivo_resultados, args.col_contato, args.col_linkedin)
