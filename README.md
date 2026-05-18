@@ -51,22 +51,9 @@ Copie a URL exibida no terminal e abra no navegador para autorizar. O token ser�
 
 Para mais detalhes, consulte a [documentação oficial do gspread](https://docs.gspread.org/en/latest/oauth2.html).
 
-## Estrutura esperada da planilha
-
-A planilha deve ter colunas para: nome da empresa, sócios (um por linha dentro da célula) e duas colunas de saída (contato encontrado e URL do LinkedIn).
-
-**Colunas padrão (configuráveis em `config/config.json`):**
-
-| Coluna | Conteúdo |
-|--------|----------|
-| C | Nome da empresa |
-| K | Nomes dos sócios (um por linha) |
-| L | **Saída:** nome do sócio encontrado (ou "N.A.") |
-| O | **Saída:** URL do LinkedIn (ou "N.A.") |
-
 ## Configuração das colunas
 
-Antes de rodar, edite `config/config.json` com as letras das colunas da sua planilha:
+**Antes de rodar**, edite `config/config.json`:
 
 ```json
 {
@@ -79,7 +66,16 @@ Antes de rodar, edite `config/config.json` com as letras das colunas da sua plan
 }
 ```
 
-> Os valores `C`, `K`, `L`, `O` são os padrões. Troque pelas letras correspondentes na sua planilha antes de executar.
+> Os valores `C`, `K`, `L`, `O` são apenas exemplos. Você **deve** trocá-los pelas letras correspondentes na sua planilha antes de executar o script.
+
+### Colunas
+
+| Chave | Descrição |
+|-------|-----------|
+| `empresa` | Coluna que contém o nome da empresa (lida pelo script) |
+| `socios` | Coluna que contém os nomes dos sócios, um por linha (lida pelo script) |
+| `contato` | Coluna onde o nome do sócio encontrado será gravado |
+| `linkedin` | Coluna onde a URL do perfil LinkedIn será gravada |
 
 ## Uso como skill do Claude Code
 
