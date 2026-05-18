@@ -9,8 +9,9 @@ CLAUDE.md
 # Claude Code — config local
 .claude/settings.local.json
 
-# Output
-output/
+# Output (arquivos gerados são ignorados, mas o diretório é rastreado)
+output/*
+!output/.gitkeep
 
 # Python
 __pycache__/

@@ -2,7 +2,7 @@
 
 Skill para [Claude Code](https://claude.ai/code) que busca automaticamente perfis LinkedIn de sócios de empresas em uma planilha Google Sheets e preenche as colunas de contato.
 
-Desenvolvido como skill do Claude Code — pode ser acionado diretamente pelo Claude ou executado manualmente via linha de comando.
+Desenvolvido como skill do Claude Code — o Claude conduz todo o fluxo, desde a leitura da planilha até a busca dos perfis e a gravação dos resultados.
 
 ## O que faz
 
@@ -15,7 +15,7 @@ Desenvolvido como skill do Claude Code — pode ser acionado diretamente pelo Cl
 
 - Python 3.8+
 - Conta Google com acesso ao [Google Cloud Console](https://console.cloud.google.com)
-- Claude Code com WebSearch habilitado
+- [Claude Code](https://claude.ai/code) — o WebSearch é uma ferramenta nativa, disponível por padrão. Para verificar, abra o Claude Code e peça: *"busque algo na web"* — se retornar resultados, está funcionando
 
 ## Instalação
 
@@ -105,9 +105,13 @@ Acione com `/busca-linkedin`. O Claude irá guiar você pela configuração das 
 
 > **Importante:** a skill edita `config/config.json` e executa os scripts relativos à pasta do projeto. O Claude Code precisa estar aberto nessa pasta para funcionar corretamente.
 
-## Execução manual (sem Claude Code)
+## Uso dos scripts diretamente
 
-Os scripts podem ser executados diretamente. Configure as colunas em `config/config.json` e leia os dados:
+> **Atenção:** o fluxo completo depende do Claude Code para executar a busca no LinkedIn via WebSearch. Os scripts abaixo são utilitários usados pela skill — podem ser rodados isoladamente para inspecionar ou corrigir dados, mas a etapa de busca é sempre conduzida pelo Claude.
+
+### Ler dados da planilha
+
+Imprime um JSON com empresas, sócios e status atual de cada linha:
 
 **Mac/Linux:**
 ```bash
@@ -119,7 +123,9 @@ python3 scripts/ler_planilha.py "URL_DA_PLANILHA" LINHA_INICIAL NUM_LINHAS
 python scripts\ler_planilha.py "URL_DA_PLANILHA" LINHA_INICIAL NUM_LINHAS
 ```
 
-Após salvar os resultados em `output/resultados.json`, atualize a planilha:
+### Reaplicar resultados existentes
+
+Se você já tem um `output/resultados.json` gerado pela skill e quer reaplicar na planilha:
 
 **Mac/Linux:**
 ```bash
@@ -131,7 +137,7 @@ python3 scripts/atualizar_planilha.py "URL_DA_PLANILHA" output/resultados.json
 python scripts\atualizar_planilha.py "URL_DA_PLANILHA" output\resultados.json
 ```
 
-> Não sabe qual usar? Rode `python --version` e `python3 --version` no terminal — use o que responder sem erro.
+> Não sabe qual usar? Rode `python --version` e `python3 --version` — use o que responder sem erro.
 
 ## Segurança
 
