@@ -1,13 +1,12 @@
-import sys
 import json
 import time
+import argparse
 import gspread
 
 
-def atualizar_planilha(url, arquivo_resultados):
+def atualizar_planilha(url, arquivo_resultados, col_contato, col_linkedin):
     gc = gspread.oauth()
-    sh = gc.open_by_url(url)
-    ws = sh.get_worksheet(0)
+    ws = gc.open_by_url(url).get_worksheet(0)
 
     with open(arquivo_resultados, "r", encoding="utf-8") as f:
         resultados = json.load(f)
@@ -22,10 +21,10 @@ def atualizar_planilha(url, arquivo_resultados):
         contato_str = "\n".join(contatos) if contatos else "N.A."
         url_str = "\n".join(urls_linkedin) if urls_linkedin else "N.A."
 
-        atualizacoes.append({"range": f"L{linha}", "values": [[contato_str]]})
+        atualizacoes.append({"range": f"{col_contato}{linha}", "values": [[contato_str]]})
 
         if not linkedin_existente.strip():
-            atualizacoes.append({"range": f"O{linha}", "values": [[url_str]]})
+            atualizacoes.append({"range": f"{col_linkedin}{linha}", "values": [[url_str]]})
 
     if atualizacoes:
         ws.batch_update(atualizacoes)
@@ -42,10 +41,11 @@ def atualizar_planilha(url, arquivo_resultados):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Uso: python atualizar_planilha.py <URL> <resultados.json>", file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Atualiza planilha Google Sheets com resultados de busca LinkedIn.")
+    parser.add_argument("url", help="URL da planilha Google Sheets")
+    parser.add_argument("arquivo_resultados", help="Caminho para o arquivo resultados.json")
+    parser.add_argument("--col-contato", default="L", metavar="COL", help="Coluna para gravar o contato (padrão: L)")
+    parser.add_argument("--col-linkedin", default="O", metavar="COL", help="Coluna para gravar a URL do LinkedIn (padrão: O)")
+    args = parser.parse_args()
 
-    url = sys.argv[1]
-    arquivo = sys.argv[2]
-    atualizar_planilha(url, arquivo)
+    atualizar_planilha(args.url, args.arquivo_resultados, args.col_contato, args.col_linkedin)
